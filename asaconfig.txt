@@ -1,0 +1,168 @@
+
+ASA#
+ASA# sh run
+: Saved
+:
+ASA Version 8.2(5)
+!
+hostname ASA
+enable password 8Ry2YjIyt7RRXU24 encrypted
+passwd 2KFQnbNIdI.2KYOU encrypted
+names
+!
+interface Ethernet0/0
+ nameif outside
+ security-level 0
+ ip address 115.252.85.40 255.255.255.224
+!
+interface Ethernet0/1
+ nameif inside
+ security-level 100
+ ip address 192.168.1.1 255.255.255.0
+!
+interface Ethernet0/2
+ nameif dmz
+ security-level 70
+ ip address 192.168.5.1 255.255.255.0
+!
+interface Ethernet0/3
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface Management0/0
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+ftp mode passive
+access-list dmz extended permit ip any any
+access-list NONAT extended permit ip 192.168.10.0 255.255.255.0 192.168.6.0 255.255.255.0
+access-list NONAT extended permit ip 192.168.2.0 255.255.255.0 192.168.100.0 255.255.255.0
+access-list vpn-enc extended permit ip 192.168.10.0 255.255.255.0 192.168.6.0 255.255.255.0
+access-list TUNNEL standard permit 192.168.2.0 255.255.255.0
+pager lines 24
+mtu outside 1500
+mtu inside 1500
+mtu dmz 1500
+ip local pool REMOTE_VPN 192.168.100.10-192.168.100.20 mask 255.255.255.0
+icmp unreachable rate-limit 1 burst-size 1
+no asdm history enable
+arp timeout 14400
+global (outside) 1 interface
+nat (inside) 0 access-list NONAT
+nat (inside) 1 192.168.10.0 255.255.255.0
+nat (inside) 1 0.0.0.0 0.0.0.0
+static (inside,dmz) 192.168.10.0 192.168.10.0 netmask 255.255.255.0
+static (inside,dmz) 192.168.20.0 192.168.20.0 netmask 255.255.255.0
+static (inside,dmz) 192.168.30.0 192.168.30.0 netmask 255.255.255.0
+static (inside,dmz) 192.168.3.0 192.168.3.0 netmask 255.255.255.0
+static (inside,dmz) 192.168.4.0 192.168.4.0 netmask 255.255.255.0
+static (inside,dmz) 192.168.2.0 192.168.2.0 netmask 255.255.255.0
+static (inside,dmz) 192.168.5.0 192.168.5.0 netmask 255.255.255.0
+access-group dmz in interface dmz
+route outside 0.0.0.0 0.0.0.0 115.252.85.33 1
+route inside 192.168.2.0 255.255.255.0 192.168.1.2 1
+route inside 192.168.3.0 255.255.255.0 192.168.1.2 1
+route inside 192.168.4.0 255.255.255.0 192.168.1.2 1
+route inside 192.168.10.0 255.255.255.0 192.168.1.2 1
+route inside 192.168.20.0 255.255.255.0 192.168.1.2 1
+route inside 192.168.30.0 255.255.255.0 192.168.1.2 1
+timeout xlate 3:00:00
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 icmp 0:00:02
+timeout sunrpc 0:10:00 h323 0:05:00 h225 1:00:00 mgcp 0:05:00 mgcp-pat 0:05:00
+timeout sip 0:30:00 sip_media 0:02:00 sip-invite 0:03:00 sip-disconnect 0:02:00
+timeout sip-provisional-media 0:02:00 uauth 0:05:00 absolute
+timeout tcp-proxy-reassembly 0:01:00
+timeout floating-conn 0:00:00
+dynamic-access-policy-record DfltAccessPolicy
+aaa authentication ssh console LOCAL
+no snmp-server location
+no snmp-server contact
+snmp-server enable traps snmp authentication linkup linkdown coldstart
+crypto ipsec transform-set COCHIN esp-des esp-sha-hmac
+crypto ipsec transform-set REMOTE_VPN esp-3des esp-sha-hmac
+crypto ipsec security-association lifetime seconds 28800
+crypto ipsec security-association lifetime kilobytes 4608000
+crypto dynamic-map OUTSIDE 20 set transform-set REMOTE_VPN
+crypto map vpn-map 1 match address vpn-enc
+crypto map vpn-map 1 set peer 115.252.85.45
+crypto map vpn-map 1 set transform-set COCHIN
+crypto map vpn-map interface outside
+crypto isakmp enable outside
+crypto isakmp policy 1
+ authentication pre-share
+ encryption 3des
+ hash sha
+ group 1
+ lifetime 86400
+telnet timeout 5
+ssh 0.0.0.0 0.0.0.0 outside
+ssh 0.0.0.0 0.0.0.0 inside
+ssh timeout 5
+console timeout 0
+threat-detection basic-threat
+threat-detection statistics access-list
+no threat-detection statistics tcp-intercept
+group-policy cisco internal
+group-policy cisco attributes
+ dns-server value 4.2.2.2
+ vpn-tunnel-protocol IPSec
+ split-tunnel-policy tunnelspecified
+ split-tunnel-network-list value TUNNEL
+group-policy CISCO internal
+username cisco password 3USUcOPFUiMCO4Jk encrypted
+tunnel-group 115.252.85.45 type ipsec-l2l
+tunnel-group 115.252.85.45 ipsec-attributes
+ pre-shared-key *****
+tunnel-group CISCO type remote-access
+tunnel-group CISCO general-attributes
+ address-pool REMOTE_VPN
+ default-group-policy CISCO
+tunnel-group CISCO ipsec-attributes
+ pre-shared-key *****
+!
+class-map inspection_default
+ match default-inspection-traffic
+!
+!
+policy-map type inspect dns preset_dns_map
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+policy-map global_policy
+ class inspection_default
+  inspect dns preset_dns_map
+  inspect ftp
+  inspect h323 h225
+  inspect h323 ras
+  inspect ip-options
+  inspect netbios
+  inspect rsh
+  inspect rtsp
+  inspect skinny
+  inspect esmtp
+  inspect sqlnet
+  inspect sunrpc
+  inspect tftp
+  inspect sip
+  inspect xdmcp
+!
+service-policy global_policy global
+prompt hostname context
+no call-home reporting anonymous
+call-home
+ profile CiscoTAC-1
+  no active
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination address email callhome@cisco.com
+  destination transport-method http
+  subscribe-to-alert-group diagnostic
+  subscribe-to-alert-group environment
+  subscribe-to-alert-group inventory periodic monthly
+  subscribe-to-alert-group configuration periodic monthly
+  subscribe-to-alert-group telemetry periodic daily
+Cryptochecksum:28be3310627d3bd53399bf261ead3fb1
+: end

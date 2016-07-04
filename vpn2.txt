@@ -1,0 +1,3 @@
+BR2(config)#crypto map vpnmap 1 ipsec-isakmp
+% NOTE: This new crypto map will remain disabled until a peer
+        and a valid access list have been configured.

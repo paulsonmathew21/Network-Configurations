@@ -1,0 +1,577 @@
+
+-----------------------------
+
+###########CME###########
+
+------------------------------
+
+
+Building configuration...
+
+
+Current configuration : 1759 bytes
+!
+! No configuration change since last restart
+version 15.1
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname CME
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+no ipv6 cef
+ip source-route
+ip cef
+!
+!
+!
+!
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+crypto pki token default removal timeout 0
+!
+!
+voice-card 0
+!
+!
+!
+!
+!
+!
+!
+license udi pid CISCO2901/K9 sn FGL163910JM
+license boot module c2900 technology-package securityk9
+hw-module pvdm 0/0
+!
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ ip address 192.168.2.2 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ no ip address
+ shutdown
+ no fair-queue
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ip route 0.0.0.0 0.0.0.0 192.168.2.1
+!
+!
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+mgcp profile default
+!
+!
+!
+!
+!
+gatekeeper
+ shutdown
+!
+!
+telephony-service
+ max-ephones 10
+ max-dn 10
+ ip source-address 192.168.2.2 port 2000
+ max-conferences 8 gain -6
+ transfer-system full-consult
+!
+!
+ephone-dn  1
+ number 1000
+!
+!
+ephone-dn  2
+ number 1001
+!
+!
+ephone  1
+ device-security-mode none
+ mac-address 3CCE.7358.C3B9
+ button  1:1
+!
+!
+!
+ephone  2
+ device-security-mode none
+ mac-address 089E.011F.1512
+ button  1:2
+!
+!
+!
+ephone  22
+ device-security-mode none
+!
+!
+!
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport input all
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ login
+ transport input all
+!
+scheduler allocate 20000 1000
+end
+
+
+-----------------------------
+
+###########ACS###########
+
+------------------------------
+
+
+ACS#sh run
+Building configuration...
+
+Current configuration : 2791 bytes
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname ACS
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+!
+no aaa new-model
+system mtu routing 1500
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-3361332096
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3361332096
+ revocation-check none
+ rsakeypair TP-self-signed-3361332096
+!
+!
+crypto pki certificate chain TP-self-signed-3361332096
+ certificate self-signed 01
+  3082023C 308201A5 A0030201 02020101 300D0609 2A864886 F70D0101 04050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 33333631 33333230 3936301E 170D3933 30333031 30303031
+  35335A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D33 33363133
+  33323039 3630819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100D52D 2E88A96E E54BC333 5FB7E587 BFF2B69A 46AF4C89 2E74B044 B5679F4F
+  1139AC5A 3EB02C00 BB0989E3 C4563718 C73B7FAC C1696861 8B450807 7D97BA51
+  D80D962A B5DE3B2C F13F8393 9EC125C5 0EED39D3 21255C87 7BB19C50 0D12D014
+  B0480918 B69BCD35 25EB1367 110074E6 C712883D BF25835D 74D6F1BF 063A1F56
+  6CB30203 010001A3 64306230 0F060355 1D130101 FF040530 030101FF 300F0603
+  551D1104 08300682 04414353 2E301F06 03551D23 04183016 801491BD 0469EB29
+  A05414A7 5323A096 962CC180 BA89301D 0603551D 0E041604 1491BD04 69EB29A0
+  5414A753 23A09696 2CC180BA 89300D06 092A8648 86F70D01 01040500 03818100
+  00A051BF 2698AA7A F8D93845 BB50250C 02A760F9 018326CD 8C72F5FD 9B9F71C1
+  86EAC18B 7323069D 96733018 34198E40 4DDEB6B1 6263C074 801ADE6F 6E03433C
+  75355906 1D124DFF C554918E 53D386C9 DA5DDAFB 94930D50 5ECE5A63 3106B232
+  22BB6069 314123A7 AB7104BC 2DA81969 4EABEA6D DDE2C6D2 9279C2C3 18C7AA43
+  quit
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+!
+!
+interface Port-channel1
+ switchport mode trunk
+!
+interface FastEthernet0/1
+ switchport access vlan 10
+ switchport mode access
+!
+interface FastEthernet0/2
+ switchport access vlan 20
+ switchport mode access
+!
+interface FastEthernet0/3
+ switchport access vlan 20
+ switchport mode access
+ switchport voice vlan 30
+ spanning-tree portfast
+!
+interface FastEthernet0/4
+!
+interface FastEthernet0/5
+!
+interface FastEthernet0/6
+!
+interface FastEthernet0/7
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 1 mode desirable
+!
+interface FastEthernet0/8
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 1 mode desirable
+!
+interface GigabitEthernet0/1
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+ip http server
+ip http secure-server
+!
+line con 0
+line vty 0 4
+ login
+line vty 5 15
+ login
+!
+end
+
+
+-----------------------------
+
+###########CORE###########
+
+------------------------------
+
+
+CORE#sh run
+Building configuration...
+
+Current configuration : 1752 bytes
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname CORE
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+system mtu routing 1500
+ip subnet-zero
+ip routing
+no ip dhcp use vrf connected
+ip dhcp excluded-address 192.168.30.1 192.168.30.5
+!
+ip dhcp pool VOICE
+   network 192.168.30.0 255.255.255.0
+   default-router 192.168.30.1
+   option 150 ip 192.168.2.2
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+!
+!
+interface Port-channel1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/1
+!
+interface FastEthernet0/2
+!
+interface FastEthernet0/3
+!
+interface FastEthernet0/4
+!
+interface FastEthernet0/5
+!
+interface FastEthernet0/6
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/7
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 1 mode desirable
+!
+interface FastEthernet0/8
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-protocol pagp
+ channel-group 1 mode desirable
+!
+interface GigabitEthernet0/1
+ no switchport
+ ip address 192.168.2.1 255.255.255.0
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan10
+ ip address 192.168.10.1 255.255.255.0
+!
+interface Vlan20
+ ip address 192.168.20.1 255.255.255.0
+!
+interface Vlan30
+ ip address 192.168.30.1 255.255.255.0
+!
+ip classless
+ip http server
+!
+ip access-list extended server-acs
+ permit ip 192.168.20.0 0.0.0.255 host 192.168.10.10
+ deny   ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
+ permit ip any any
+!
+!
+control-plane
+!
+!
+line con 0
+line vty 0 4
+ login
+line vty 5 15
+ login
+!
+end
+
+-----------------------------
+
+########### ASA ###########
+
+------------------------------
+
+
+ASA Version 8.2(5)
+!
+hostname ASA
+enable password 8Ry2YjIyt7RRXU24 encrypted
+passwd 2KFQnbNIdI.2KYOU encrypted
+names
+!
+interface Ethernet0/0
+ nameif outside
+ security-level 0
+ ip address 115.252.85.40 255.255.255.224
+!
+interface Ethernet0/1
+ nameif inside
+ security-level 100
+ ip address 192.168.1.1 255.255.255.0
+!
+interface Ethernet0/2
+ nameif dmz
+ security-level 70
+ ip address 192.168.5.1 255.255.255.0
+!
+interface Ethernet0/3
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface Management0/0
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+ftp mode passive
+access-list NONAT extended permit ip 192.168.10.0 255.255.255.0 192.168.6.0 255.255.255.0
+access-list NONAT extended permit ip 192.168.2.0 255.255.255.0 192.168.100.0 255.255.255.0
+access-list vpn-ene extended permit ip 192.168.10.0 255.255.255.0 192.168.6.0 255.255.255.0
+access-list TUNNEL standard permit 192.168.2.0 255.255.255.0
+pager lines 24
+mtu outside 1500
+mtu inside 1500
+mtu dmz 1500
+ip local pool REMOTEVPN 192.168.100.10-192.168.100.20 mask 255.255.255.0
+icmp unreachable rate-limit 1 burst-size 1
+no asdm history enable
+arp timeout 14400
+global (outside) 1 interface
+nat (inside) 0 access-list NONAT
+nat (inside) 1 0.0.0.0 0.0.0.0
+route outside 0.0.0.0 0.0.0.0 115.252.85.33 1
+route outside 0.0.0.0 0.0.0.0 115.252.85.32 1
+route inside 192.168.2.0 255.255.255.0 192.168.1.2 1
+route inside 192.168.3.0 255.255.255.0 192.168.1.2 1
+route inside 192.168.4.0 255.255.255.0 192.168.1.2 1
+route inside 192.168.10.0 255.255.255.0 192.168.1.2 1
+route inside 192.168.20.0 255.255.255.0 192.168.1.2 1
+route inside 192.168.30.0 255.255.255.0 192.168.1.2 1
+timeout xlate 3:00:00
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 icmp 0:00:02
+timeout sunrpc 0:10:00 h323 0:05:00 h225 1:00:00 mgcp 0:05:00 mgcp-pat 0:05:00
+timeout sip 0:30:00 sip_media 0:02:00 sip-invite 0:03:00 sip-disconnect 0:02:00
+timeout sip-provisional-media 0:02:00 uauth 0:05:00 absolute
+timeout tcp-proxy-reassembly 0:01:00
+timeout floating-conn 0:00:00
+dynamic-access-policy-record DfltAccessPolicy
+no snmp-server location
+no snmp-server contact
+snmp-server enable traps snmp authentication linkup linkdown coldstart
+crypto ipsec transform-set COCHIN esp-3des esp-sha-hmac
+crypto ipsec transform-set REMOTEVPN esp-3des esp-sha-hmac
+crypto ipsec security-association lifetime seconds 28800
+crypto ipsec security-association lifetime kilobytes 4608000
+crypto dynamic-map outside 20 set transform-set REMOTEVPN
+crypto map vpn-map 1 match address vpn-ene
+crypto map vpn-map 1 set peer 115.252.85.45
+crypto map vpn-map 1 set transform-set COCHIN
+crypto map vpn-map interface outside
+crypto map VPN-MAP 65535 ipsec-isakmp dynamic outside
+crypto isakmp enable outside
+crypto isakmp policy 1
+ authentication pre-share
+ encryption 3des
+ hash sha
+ group 1
+ lifetime 86400
+crypto isakmp policy 65535
+ authentication pre-share
+ encryption 3des
+ hash sha
+ group 2
+ lifetime 86400
+telnet timeout 5
+ssh timeout 5
+console timeout 0
+threat-detection basic-threat
+threat-detection statistics access-list
+no threat-detection statistics tcp-intercept
+group-policy CISCO internal
+group-policy CISCO attributes
+ dns-server value 4.2.2.2
+ vpn-tunnel-protocol IPSec
+ split-tunnel-policy tunnelspecified
+ split-tunnel-network-list value TUNNEL
+username cisco password 3USUcOPFUiMCO4Jk encrypted
+tunnel-group 115.252.85.45 type ipsec-l2l
+tunnel-group 115.252.85.45 ipsec-attributes
+ pre-shared-key *****
+tunnel-group CISCO type remote-access
+tunnel-group CISCO general-attributes
+ address-pool REMOTEVPN
+ default-group-policy CISCO
+tunnel-group CISCO ipsec-attributes
+ pre-shared-key *****
+!
+class-map inspection_default
+ match default-inspection-traffic
+!
+!
+policy-map type inspect dns preset_dns_map
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+policy-map global_policy
+ class inspection_default
+  inspect dns preset_dns_map
+  inspect ftp
+  inspect h323 h225
+  inspect h323 ras
+  inspect ip-options
+  inspect netbios
+  inspect rsh
+  inspect rtsp
+  inspect skinny
+  inspect esmtp
+  inspect sqlnet
+  inspect sunrpc
+  inspect tftp
+  inspect sip
+  inspect xdmcp
+!
+service-policy global_policy global
+prompt hostname context
+no call-home reporting anonymous
+call-home
+ profile CiscoTAC-1
+  no active
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination address email callhome@cisco.com
+  destination transport-method http
+  subscribe-to-alert-group diagnostic
+  subscribe-to-alert-group environment
+  subscribe-to-alert-group inventory periodic monthly
+  subscribe-to-alert-group configuration periodic monthly
+  subscribe-to-alert-group telemetry periodic daily
+Cryptochecksum:ac37010586860808683b40d45710d85e
+: end
+

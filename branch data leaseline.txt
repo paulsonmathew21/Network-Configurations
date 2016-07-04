@@ -1,0 +1,27 @@
+BR1#sh run
+Building configuration...
+
+Current configuration : 783 bytes
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname BR1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+ip cef
+!
+!
+!
+!
+username CME password 0 cisco
+!
+!
+
+BR1#

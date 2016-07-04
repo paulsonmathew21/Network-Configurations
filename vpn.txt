@@ -1,0 +1,29 @@
+int fa0/0
+ip address 115.252.85.45 255.255.255.0
+no sh
+
+int fa0/1
+ip address 192.168.4.1 255.255.255.0
+no sh
+
+ip route 0.0.0.0 0.0.0.0 115.252.85.33
+
+crypto isakmp policy 2
+ authentication pre-share
+crypto isakmp key cisco address 115.252.85.40
+
+
+
+crypto ipsec transform-set l2l esp-des esp-sha-hmac
+crypto map VPN_MAP 1 ipsec-isakmp
+ set peer 115.252.85.40
+ set transform-set l2l
+ match address 100
+access-list 100 permit ip 192.168.6.0 0.0.0.255 192.168.10.0 0.0.0.255
+access-list 110 permit ip 192.168.6.0 0.0.0.255 192.168.10.0 0.0.0.255
+route-map nonat permit 10
+ match ip address 110
+
+
+ip nat inside source route-map nonat interface FastEthernet0/0 overload
+
